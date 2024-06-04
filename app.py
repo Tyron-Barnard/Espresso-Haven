@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 app = Flask(__name__)
-app.secret_key = os.environ.get('SECRET_KEY', '429d56ce8188afb4ce934c3c5c9394ca')
+app.secret_key = os.environ.get('SECRET_KEY', 'DEFAULT_KEY')
 
 
 # Configure Flask-Mail
