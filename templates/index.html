@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Espresso Haven</title>
+    <link rel="icon" href="{{ url_for('static', filename='svg/coffee.svg') }}" type="image/icon type">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+    <style>
+        .header {
+            min-height: 100vh;
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.5)),
+            url("{{ url_for('static', filename='images/Cafe3.jpeg') }}") center/cover no-repeat;
+            position: relative;
+            background-attachment: fixed;
+        }
+
+        .menu-template {
+            height: 40vh;
+            width: 100%;
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.5)),
+            url("{{ url_for('static', filename='images/Cafe1.jpg') }}") center/cover no-repeat;
+            position: relative;
+            background-attachment: fixed;
+        }
+
+        .contact-img,
+        .contact-map {
+        padding: 1rem;
+        float: left;
+        width: 50%;
+        padding: 2rem;
+        }
+
+        .contact-iframe{
+        border-radius: 1rem;
+        width: 100%;
+        height: 395px;
+        }
+
+        .contact-template{
+        height: 40vh;
+        width: 100%;
+        background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.5)),
+        url("{{ url_for('static', filename='images/map4.jpeg') }}") center/cover no-repeat;
+        position: relative;
+        background-attachment: fixed;
+        
+        }
+
+        .contact-title {
+        font-family: SpartanLimport;
+        color:#bd1220;
+        margin-top: 2.5rem;
+        line-height: 1.3;
+        text-align: center;
+        padding-top: 7%;
+        font-size: 30px;
+        }
+
+        /* The Modal (background) */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1; /* Sit on top */
+            padding-top: 100px; /* Location of the box */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgb(0,0,0); /* Fallback color */
+            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+        }
+
+        /* Modal Content */
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 600px;
+            text-align: center;
+            border-radius: 10px;
+        }
+
+        /* The Close Button */
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .btn {
+            background-color: #BD1220;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 10px; /* Add space above button */
+        }
+
+        .btn:hover {
+            background-color: #9B0E1B;
+        }
+
+        .cart-popup {
+            display: none;
+            position: fixed;
+            right: 20px;
+            top: 100px;
+            width: 300px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+            z-index: 1000;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .cart-popup-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #BD1220;
+            color: white;
+            padding: 10px;
+        }
+
+        .cart-popup-content {
+            padding: 10px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .cart-popup-footer {
+            padding: 10px;
+            background-color: #f1f1f1;
+        }
+
+        p.footer-policy {
+        margin-top: -30px; /* Negative value to move the button up */
+        }
+
+
+    </style>
+    <script>
+        let cart = [];
+
+        function addToCart(item, price) {
+            cart.push({ item, price });
+            showPopup("Item added to cart!");
+            updateCart();
+        }
+
+        function updateCart() {
+            const cartItems = document.getElementById('cart-items');
+            cartItems.innerHTML = "";
+            let total = 0;
+            cart.forEach(({ item, price }) => {
+                const cartItem = document.createElement('div');
+                cartItem.textContent = `${item} - R ${price}`;
+                cartItems.appendChild(cartItem);
+                total += price;
+            });
+            const totalElement = document.createElement('div');
+            totalElement.style.fontWeight = 'bold';
+            totalElement.textContent = `Total: R ${total}`;
+            cartItems.appendChild(totalElement);
+        }
+
+        function toggleCart() {
+            const cartPopup = document.getElementById('cart-popup');
+            cartPopup.style.display = cartPopup.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function showPopup(message) {
+            const popup = document.createElement('div');
+            popup.className = 'popup-message';
+            popup.textContent = message;
+            document.body.appendChild(popup);
+            setTimeout(() => {
+                popup.remove();
+            }, 2000);
+        }
+
+        window.onscroll = function() { Scroll() };
+        function Scroll() {
+            if (document.body.scrollTop > 700 || document.documentElement.scrollTop > 700) {
+                document.getElementById("id-navi").className = "navi-slidedown";
+            }
+            if (document.body.scrollTop > 450 || document.documentElement.scrollTop > 450) {
+                document.getElementById("id-about-scroll").className = "scroll-about";
+            }
+        }
+
+        function menuButtonSnacks(){
+            document.getElementById("id-drinks").className = "menu-button-off";
+            document.getElementById("id-snacks").className = "menu-button-on";
+            document.getElementById("id-menu-snacks").className = "menu-snacks-on";
+            document.getElementById("id-menu-drinks").className = "menu-drinks-off";
+        }
+        function menuButtonDrinks(){
+            document.getElementById("id-drinks").className = "menu-button-on";
+            document.getElementById("id-snacks").className = "menu-button-off";
+            document.getElementById("id-menu-snacks").className = "menu-snacks-off";
+            document.getElementById("id-menu-drinks").className = "menu-drinks-on";
+        }
+
+        // Function to handle form submission
+        function submitReview(event) {
+            event.preventDefault(); // Prevent page reload
+
+            // Get form values
+            const name = document.getElementById('fname').value;
+            const email = document.getElementById('email').value;
+            const feedback = document.getElementById('feedback').value;
+
+            // Create new testimonial element
+            const newTestimonial = document.createElement('div');
+            newTestimonial.classList.add('mySlides', 'fade');
+            newTestimonial.innerHTML = `
+                <br>
+                <p class="p1">"${feedback}"</p>
+                <br>
+                <img class="slider-img1" src="{{ url_for('static', filename='images/user.png') }}">
+                <h3 class="slider-name1">${name}</h3>
+                <br><br>
+                <hr class="slides-hr">
+            `;
+
+            // Append new testimonial to the testimonials section
+            document.getElementById('testimonials').appendChild(newTestimonial);
+
+            // Add a new dot for the new testimonial
+            const newDot = document.createElement('span');
+            newDot.classList.add('dot');
+            document.querySelector('.dot-container').appendChild(newDot);
+
+            // Update the slide index and show the slides
+            slideIndex = 0;
+            showSlides();
+
+            // Show thank you popup
+            alert('Thank you for your feedback!');
+
+            // Clear form
+            document.getElementById('review-form').reset();
+        }
+
+        // Show discount popup if registered
+        function showDiscountPopup() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const isRegistered = urlParams.get('registered');
+
+            if (isRegistered) {
+                const modal = document.getElementById('discountModal');
+                const span = document.getElementsByClassName('close')[0];
+
+                modal.style.display = 'block';
+
+                span.onclick = function() {
+                    modal.style.display = 'none';
+                }
+
+                window.onclick = function(event) {
+                    if (event.target == modal) {
+                        modal.style.display = 'none';
+                    }
+                }
+            }
+        }
+
+        // Slideshow
+        var slideIndex = 0;
+        function showSlides() {
+            var i;
+            var slides = document.getElementsByClassName("mySlides");
+            var dots = document.getElementsByClassName("dot");
+            for (i = 0; i < slides.length; i++) {
+                slides[i].style.display = "none";
+            }
+            slideIndex++;
+            if (slideIndex > slides.length) {slideIndex = 1}
+            for (i = 0; i < dots.length; i++) {
+                dots[i].className = dots[i].className.replace(" active", "");
+            }
+            slides[slideIndex-1].style.display = "block";
+            dots[slideIndex-1].className += " active";
+            setTimeout(showSlides, 4000); // Change image every 4 seconds
+        }
+
+        window.onload = function() {
+            showSlides();
+            showDiscountPopup();
+        }
+    </script>
+    
+</head>
+
+<body>
+    <header class="header">
+        <section class="main">
+            <div class="logo-container">
+                <a class="logo" href="{{ url_for('home') }}"><img src="{{ url_for('static', filename='svg/coffee.svg') }}" height="30px"></a>
+            </div>
+            <div class="fix">
+                <a class="a1" href="{{ url_for('register') }}">BECOME A MEMBER</a>
+                <a class="a1" href="javascript:void(0);" onclick="toggleCart()">CART</a>
+                <a class="a1" href="#id-menu">DISCOVER</a>
+                <a class="a1" href="#id-about">ABOUT US</a>
+                <a class="a1" href="{{ url_for('home') }}">HOME</a>
+            </div>
+        </section>
+        <div class="fix-background" id="id-navi"></div>
+        <div class="banner">
+            <h1 class="banner-title">Espresso Haven</h1>
+            <h3 class="banner-subtitle">"A Cozy Coffee Retreat"</h3>
+        </div>
+        <div class="banner-bottom"><a href="#id-skills"><img src="{{ url_for('static', filename='svg/down-arrow.svg') }}"></a></div>
+    </header>
+    <div class="content-divider"></div>
+
+    <section class="skills" id="id-skills">
+        <!-- single skill -->
+        <article class="skill1">
+            <center><img src="{{ url_for('static', filename='svg/coffee-bag.svg') }}" height="45px"></center><br>
+            <h3 class="skill-title">made in us</h3>
+            <p class="skill-text">
+                Proudly sourced and roasted in the SA for the freshest taste.
+            </p>
+        </article>
+        <!--end single skill -->
+        <!-- single skill -->
+        <article class="skill2">
+            <center><img src="{{ url_for('static', filename='svg/spa.svg') }}" height="45px"></center><br>
+            <h3 class="skill-title">relaxation</h3>
+            <p class="skill-text">
+                Unwind in our cozy, peaceful environment with your favorite brew.
+            </p>
+        </article>
+        <!--end single skill -->
+        <!-- single skill -->
+        <article class="skill1">
+            <center><img src="{{ url_for('static', filename='svg/ecology-and-environment.svg') }}" height="45px"></center><br>
+            <h3 class="skill-title">energy</h3>
+            <p class="skill-text">
+                Boost your day with our energizing coffee blends.
+            </p>
+        </article>
+        <!--end single skill -->
+        <!-- single skill -->
+        <article class="skill2">
+            <center><img src="{{ url_for('static', filename='svg/cook.svg') }}" height="45px"></center><br>
+            <h3 class="skill-title">family recipe</h3>
+            <p class="skill-text">
+                Enjoy unique flavors from our secret family recipes.
+            </p>
+        </article>
+        <!--end single skill -->
+    </section>
+
+    <div class="about">
+        <br>
+        <br>
+        <section class="about-section-center-clearfix" id="id-about">
+            <!-- first column  -->
+            <article class="about-img-1">
+                <div class="about-picture-container">
+                    <video autoplay muted loop id="myVideo">
+                        <source src="{{ url_for('static', filename='videos/woman-drinking-coffee.mp4') }}" type="video/mp4">
+                    </video>
+                </div>
+            </article>
+            <!-- second column -->
+            <article class="about-info-1">
+                <!-- section title -->
+                <div class="about-scroll" id="id-about-scroll">
+                    <h3 class="section-subtitle">ABOUT</h3>
+                    <h2 class="section-title">Espresso Haven</h2>
+                    <p class="about-text">
+                        Welcome to Espresso Haven, your ultimate destination for the finest coffee experiences. Our beans are meticulously sourced and roasted to perfection in the SA, bringing you the freshest and most delightful flavors.
+                    </p>
+                    <p class="about-text">
+                        Whether you're here to relax in our cozy ambiance, recharge with an energizing brew, or savor the unique tastes of our family recipes, Espresso Haven is where coffee dreams come true.
+                    </p>
+                    <p class="about-text" style="color: green; font-weight: bold; font-size: 1.2em; border: 2px solid green; padding: 10px; border-radius: 5px;">
+                        Become a member and enjoy a 5% discount on all your purchases!
+                    </p>
+                    <a href="#id-contact" class="main-btn">learn more</a>
+                    <div class="main-btn-back"></div>
+                </div>
+            </article>
+            <div style="clear: both;"></div>
+        </section>
+    </div>
+    
+    <br>
+    <br>
+    </div>
+
+    <!--Menu-->
+    <div style="background-color:#E0E5EC; z-index: -1;">
+        <section class="menu-template" id="id-menu">
+            <h1 class="menu-title">Discover</h1><br>
+            <center><h3 class="menu-subtitle">O U R &nbsp;&nbsp;M E N U</h3></center>
+        </section><br><br>
+
+        <section class="menu-header-container">
+            <div class="menu-hr-container"><hr class="menu-hr"></div>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <button type="button" id="id-drinks" class="menu-button-on" onclick="menuButtonDrinks()"><img src="{{ url_for('static', filename='svg/hot-drinks (1).png') }}" class="menu-circle-image"></button>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <button type="button" id="id-snacks" class="menu-button-off" onclick="menuButtonSnacks()"><img src="{{ url_for('static', filename='svg/snack.png') }}" class="menu-circle-image"></button>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <div class="menu-hr-container"><hr class="menu-hr"></div>
+        </section>
+
+        <!-- drinks menu -->
+        <div class="menu-drinks-on" id="id-menu-drinks">
+            <section class="menu" style="display: inline;">
+                <article class="menu-section">
+                    <!-- first column -->
+                    <div class="menu-flip-card">
+                        <div class="menu-flip-card-inner">
+                            <div class="menu-flip-card-front">
+                                <img src="{{ url_for('static', filename='Coffee/1.jpeg') }}" alt="CAFFE AMERICANO" class="menu-image">
+                            </div>
+                            <div class="menu-flip-card-back">
+                                <div class="menu-text">
+                                    <h3 class="menu-text-title">CAFFE AMERICANO</h3>
+                                    <p class="about-text">A classic blend of espresso and hot water for a smooth, rich flavor.</p>
+                                    <h3 class="menu-text-title">R 25.00</h3>
+                                    <button class="btn" onclick="addToCart('CAFFE AMERICANO', 25)">Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Repeat for other menu items -->
+                <!-- second column -->
+                <article class="menu-section">
+                    <div class="menu-flip-card">
+                        <div class="menu-flip-card-inner">
+                            <div class="menu-flip-card-front">
+                                <img src="{{ url_for('static', filename='Coffee/14.jpeg') }}" alt="HOT COFFEE" class="menu-image">
+                            </div>
+                            <div class="menu-flip-card-back">
+                                <div class="menu-text">
+                                    <h3 class="menu-text-title">HOT COFFEE</h3>
+                                    <p class="about-text">Freshly brewed to perfection, ideal for starting your day right.</p>
+                                    <h3 class="menu-text-title">R 20.00</h3>
+                                    <button class="btn" onclick="addToCart('HOT COFFEE', 20)">Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- third column -->
+                <article class="menu-section">
+                    <div class="menu-flip-card">
+                        <div class="menu-flip-card-inner">
+                            <div class="menu-flip-card-front">
+                                <img src="{{ url_for('static', filename='Coffee/2.jpeg') }}" alt="CREAM LATTE" class="menu-image">
+                            </div>
+                            <div class="menu-flip-card-back">
+                                <div class="menu-text">
+                                    <h3 class="menu-text-title">CREAM LATTE</h3>
+                                    <p class="about-text">Espresso with steamed milk and a touch of cream, perfect for a creamy delight.</p>
+                                    <h3 class="menu-text-title">R 30.00</h3>
+                                    <button class="btn" onclick="addToCart('CREAM LATTE', 30)">Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+                <!-- fourth column -->
+                <article class="menu-section">
+                    <div class="menu-flip-card">
+                        <div class="menu-flip-card-inner">
+                            <div class="menu-flip-card-front">
+                                <img src="{{ url_for('static', filename='Coffee/12.jpeg') }}" alt="ICED LATTE" class="menu-image">
+                            </div>
+                            <div class="menu-flip-card-back">
+                                <div class="menu-text">
+                                    <h3 class="menu-text-title">ICED LATTE</h3>
+                                    <p class="about-text">Chilled coffee served over ice for a refreshing pick-me-up.</p>
+                                    <h3 class="menu-text-title">R 25.00</h3>
+                                    <button class="btn" onclick="addToCart('ICED LATTE', 25)">Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+                <div style="clear: both;"></div>
+                <br>
+            </section>
+            <section class="menu" style="display: inline;">
+                <article class="menu-section">
+                    <!-- first column -->
+                    <div class="menu-flip-card">
+                        <div class="menu-flip-card-inner">
+                            <div class="menu-flip-card-front">
+                                <img src="{{ url_for('static', filename='Coffee/15.jpeg') }}" alt="COFFEE SHOTS" class="menu-image">
+                            </div>
+                            <div class="menu-flip-card-back">
+                                <div class="menu-text">
+                                    <h3 class="menu-text-title">COFFEE SHOTS</h3>
+                                    <p class="about-text">Pure espresso shots, perfect for a quick energy boost.</p>
+                                    <h3 class="menu-text-title">R 15.00</h3>
+                                    <button class="btn" onclick="addToCart('COFFEE SHOTS', 15)">Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- second column -->
+                <article class="menu-section">
+                    <div class="menu-flip-card">
+                        <div class="menu-flip-card-inner">
+                            <div class="menu-flip-card-front">
+                                <img src="{{ url_for('static', filename='Coffee/16.jpeg') }}" alt="HERBAL" class="menu-image">
+                            </div>
+                            <div class="menu-flip-card-back">
+                                <div class="menu-text">
+                                    <h3 class="menu-text-title">HERBAL</h3>
+                                    <p class="about-text">A soothing blend of natural herbs for a calming experience.</p>
+                                    <h3 class="menu-text-title">R 20.00</h3>
+                                    <button class="btn" onclick="addToCart('HERBAL', 20)">Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- third column -->
+                <article class="menu-section">
+                    <div class="menu-flip-card">
+                        <div class="menu-flip-card-inner">
+                            <div class="menu-flip-card-front">
+                                <img src="{{ url_for('static', filename='Coffee/17.jpeg') }}" alt="HERBAL CHERRY" class="menu-image">
+                            </div>
+                            <div class="menu-flip-card-back">
+                                <div class="menu-text">
+                                    <h3 class="menu-text-title">HERBAL CHERRY</h3>
+                                    <p class="about-text">A delightful mix of herbal tea with a hint of cherry flavor.</p>
+                                    <h3 class="menu-text-title">R 25.00</h3>
+                                    <button class="btn" onclick="addToCart('HERBAL CHERRY', 25)">Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+                <!-- fourth column -->
+                <article class="menu-section">
+                    <div class="menu-flip-card">
+                        <div class="menu-flip-card-inner">
+                            <div class="menu-flip-card-front">
+                                <img src="{{ url_for('static', filename='Coffee/18.jpeg') }}" alt="FILTERED COFFEE" class="menu-image">
+                            </div>
+                            <div class="menu-flip-card-back">
+                                <div class="menu-text">
+                                    <h3 class="menu-text-title">FILTERED COFFEE</h3>
+                                    <p class="about-text">Slow-brewed for a clean, rich, and aromatic cup.</p>
+                                    <h3 class="menu-text-title">R 20.00</h3>
+                                    <button class="btn" onclick="addToCart('FILTERED COFFEE', 20)">Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+                <div style="clear: both;"></div>
+                <br>
+            </section>
+            <br>
+        </div>
+        <!-- drinks menu ending -->
+
+        <!-- snacks menu -->
+        <div class="menu-snacks-off" id="id-menu-snacks">
+            <section class="menu" style="display: inline;">
+                <article class="menu-section">
+                    <!-- first column -->
+                    <div class="menu-flip-card">
+                        <div class="menu-flip-card-inner">
+                            <div class="menu-flip-card-front">
+                                <img src="{{ url_for('static', filename='Coffee/29.jpeg') }}" alt="PIZZA" class="menu-image">
+                            </div>
+                            <div class="menu-flip-card-back">
+                                <div class="menu-text">
+                                    <h3 class="menu-text-title">PIZZA</h3>
+                                    <p class="about-text">Deliciously topped with fresh ingredients and melted cheese on a crispy crust.</p>
+                                    <h3 class="menu-text-title">R 75.00</p>
+                                    <button class="btn" onclick="addToCart('PIZZA', 75)">Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- second column -->
+                <article class="menu-section">
+                    <div class="menu-flip-card">
+                        <div class="menu-flip-card-inner">
+                            <div class="menu-flip-card-front">
+                                <img src="{{ url_for('static', filename='Coffee/21.jpeg') }}" alt="FRIES" class="menu-image">
+                            </div>
+                            <div class="menu-flip-card-back">
+                                <div class="menu-text">
+                                    <h3 class="menu-text-title">FRIES</h3>
+                                    <p class="about-text">Golden and crispy, the perfect side to any meal.</p>
+                                    <h3 class="menu-text-title">R 30.00</p>
+                                    <button class="btn" onclick="addToCart('FRIES', 30)">Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- third column -->
+                <article class="menu-section">
+                    <div class="menu-flip-card">
+                        <div class="menu-flip-card-inner">
+                            <div class="menu-flip-card-front">
+                                <img src="{{ url_for('static', filename='Coffee/22.jpeg') }}" alt="BURGER" class="menu-image">
+                            </div>
+                            <div class="menu-flip-card-back">
+                                <div class="menu-text">
+                                    <h3 class="menu-text-title">BURGER</h3>
+                                    <p class="about-text">Juicy beef patty with fresh toppings, served in a toasted bun.</p>
+                                    <h3 class="menu-text-title">R 60.00</h3>
+                                    <button class="btn" onclick="addToCart('BURGER', 60)">Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+                <!-- fourth column -->
+                <article class="menu-section">
+                    <div class="menu-flip-card">
+                        <div class="menu-flip-card-inner">
+                            <div class="menu-flip-card-front">
+                                <img src="{{ url_for('static', filename='Coffee/24.jpeg') }}" alt="SANDWICH" class="menu-image">
+                            </div>
+                            <div class="menu-flip-card-back">
+                                <div class="menu-text">
+                                    <h3 class="menu-text-title">SANDWICH</h3>
+                                    <p class="about-text">A variety of fillings between slices of fresh bread, perfect for a quick bite.</p>
+                                    <h3 class="menu-text-title">R 40.00</h3>
+                                    <button class="btn" onclick="addToCart('SANDWICH', 40)">Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+                <div style="clear: both;"></div>
+                <br>
+            </section>
+            <section class="menu" style="display: inline;">
+                <article class="menu-section">
+                    <!-- first column -->
+                    <div class="menu-flip-card">
+                        <div class="menu-flip-card-inner">
+                            <div class="menu-flip-card-front">
+                                <img src="{{ url_for('static', filename='Coffee/25.jpeg') }}" alt="FRENCH TOAST" class="menu-image">
+                            </div>
+                            <div class="menu-flip-card-back">
+                                <div class="menu-text">
+                                    <h3 class="menu-text-title">FRENCH TOAST</h3>
+                                    <p class="about-text">Golden-brown French toast topped with bananas, blueberries, and drizzled with syrup.</p>
+                                    <h3 class="menu-text-title">R 50.00</h3>
+                                    <button class="btn" onclick="addToCart('FRENCH TOAST', 50)">Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- second column -->
+                <article class="menu-section">
+                    <div class="menu-flip-card">
+                        <div class="menu-flip-card-inner">
+                            <div class="menu-flip-card-front">
+                                <img src="{{ url_for('static', filename='Coffee/26.jpeg') }}" alt="WAFFLE" class="menu-image">
+                            </div>
+                            <div class="menu-flip-card-back">
+                                <div class="menu-text">
+                                    <h3 class="menu-text-title">WAFFLE</h3>
+                                    <p class="about-text">Crispy on the outside, fluffy on the inside, served with your favorite toppings.</p>
+                                    <h3 class="menu-text-title">R 45.00</p>
+                                    <button class="btn" onclick="addToCart('WAFFLE', 45)">Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- third column -->
+                <article class="menu-section">
+                    <div class="menu-flip-card">
+                        <div class="menu-flip-card-inner">
+                            <div class="menu-flip-card-front">
+                                <img src="{{ url_for('static', filename='Coffee/27.jpeg') }}" alt="COOKIES" class="menu-image">
+                            </div>
+                            <div class="menu-flip-card-back">
+                                <div class="menu-text">
+                                    <h3 class="menu-text-title">COOKIES</h3>
+                                    <p class="about-text">Freshly baked, soft, and chewy with a variety of flavors.</p>
+                                    <h3 class="menu-text-title">R 20.00</h3>
+                                    <button class="btn" onclick="addToCart('COOKIES', 20)">Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+                <!-- fourth column -->
+                <article class="menu-section">
+                    <div class="menu-flip-card">
+                        <div class="menu-flip-card-inner">
+                            <div class="menu-flip-card-front">
+                                <img src="{{ url_for('static', filename='Coffee/20.jpeg') }}" alt="MIX BREAKFAST" class="menu-image">
+                            </div>
+                            <div class="menu-flip-card-back">
+                                <div class="menu-text">
+                                    <h3 class="menu-text-title">MIX BREAKFAST</h3>
+                                    <p class="about-text">A delightful assortment of fresh fruits, nuts, cheeses, and artisanal bread, perfect for a balanced and nutritious start to your day.</p>
+                                    <h3 class="menu-text-title">R 85.00</h3>
+                                    <button class="btn" onclick="addToCart('MIX BREAKFAST', 85)">Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <div style="clear: both;"></div>
+                <br>
+            </section>
+            <br>
+        </div>
+        <!-- snacks menu ending -->
+
+        <!--Response-->
+        <div class="back">
+            <section class="about-section-center-clearfix">
+                <article class="about-img">
+                    <h3 class="response-title">YOUR RESPONSE</h3>
+                    <br>
+                    <form id="review-form" onsubmit="submitReview(event)">
+                        <label for="fname">Name</label>
+                        <input type="text" id="fname" name="firstname" placeholder="Alex Hunter" required>
+                        <label for="mail">E-Mail</label>
+                        <input type="email" id="email" name="mail" placeholder="alexhunter@xyz.com" required>
+                        <label for="subject">Your Reviews</label>
+                        <textarea id="feedback" name="feedback" placeholder="Your Thoughts" style="height:120px"></textarea>
+                        <p align="right"><input type="submit" value="Submit"></p>
+                    </form>
+                </article>
+                <!-- second column -->
+                <article class="about-info-slider">
+                    <h3 class="response-title">TESTIMONIALS</h3>
+                    <!--end section title -->
+                    <div class="slideshow-container" id="testimonials">
+                        <div class="mySlides fade">
+                            <br>
+                            <p class="p1">“Espresso Haven is my go-to coffee shop! The ambiance is perfect for relaxing or getting some work done. Their Cream Latte is simply the best I've ever had ”</p>
+                            <br>
+                            <img class="slider-img1" src="{{ url_for('static', filename='people/1.jpeg') }}">
+                            <h3 class="slider-name1">Charles White</h3>
+                            <br><br>
+                            <hr class="slides-hr">
+                            <div class="social">
+                                <img src="{{ url_for('static', filename='svg/instagram-red.svg') }}" class="slider-social">
+                                <img src="{{ url_for('static', filename='svg/facebook-red.svg') }}" class="slider-social">
+                            </div>
+                            <br><br><br>
+                            <p class="p2">“ I absolutely love the variety at Espresso Haven. From their Hot Coffee to the Herbal Cherry, everything is top-notch. The staff is always friendly and welcoming too ”</p>
+                            <br>
+                            <img class="slider-img2" src="{{ url_for('static', filename='people/5.jpeg') }}">
+                            <h3 class="slider-name2">Seth Doyle</h3>
+                            <br><br>
+                            <hr class="slides-hr1">
+                            <div class="social2">
+                                <img src="{{ url_for('static', filename='svg/instagram-red.svg') }}" class="slider-social">
+                                <img src="{{ url_for('static', filename='svg/facebook-red.svg') }}" class="slider-social">
+                            </div>
+                        </div>
+
+                        <div class="mySlides fade">
+                            <br>
+                            <p class="p1">“ The mix breakfast at Espresso Haven is a great way to start the day. The fresh ingredients and delicious flavors are unbeatable. Highly recommend it ”</p>
+                            <br>
+                            <img class="slider-img1" src="{{ url_for('static', filename='people/2.jpeg') }}">
+                            <h3 class="slider-name1">Roberto Webb</h3>
+                            <br><br>
+                            <hr class="slides-hr">
+                            <div class="social">
+                                <img src="{{ url_for('static', filename='svg/instagram-red.svg') }}" class="slider-social">
+                                <img src="{{ url_for('static', filename='svg/facebook-red.svg') }}" class="slider-social">
+                            </div>
+                            <br><br><br>
+                            <p class="p2">“ Espresso Haven has the best coffee in town. Their Coffee Shots give me the perfect boost I need in the morning, and the cozy atmosphere makes it my favorite spot ”</p>
+                            <br>
+                            <img class="slider-img2" src="{{ url_for('static', filename='people/4.jpeg') }}">
+                            <h3 class="slider-name2">Midas Hofsatra</h3>
+                            <br><br>
+                            <hr class="slides-hr1">
+                            <div class="social2">
+                                <img src="{{ url_for('static', filename='svg/instagram-red.svg') }}" class="slider-social">
+                                <img src="{{ url_for('static', filename='svg/facebook-red.svg') }}" class="slider-social">
+                            </div>
+                        </div>
+
+                        <div class="mySlides fade">
+                            <br>
+                            <p class="p1">“ I can't get enough of Espresso Haven's Iced Coffee. It's refreshing and perfect for a hot day. The quality of their coffee is always consistent and amazing. ”</p>
+                            <br>
+                            <img class="slider-img1" src="{{ url_for('static', filename='people/3.jpeg') }}">
+                            <h3 class="slider-name1">Mellisa Howard</h3>
+                            <br><br>
+                            <hr class="slides-hr">
+                            <div class="social">
+                                <img src="{{ url_for('static', filename='svg/instagram-red.svg') }}" class="slider-social">
+                                <img src="{{ url_for('static', filename='svg/facebook-red.svg') }}" class="slider-social">
+                            </div>
+                            <br><br><br>
+                            <p class="p2">“ The family recipe drinks at Espresso Haven are unique and flavorful. I love their attention to detail and the passion they put into every cup. It's a must-visit for any coffee lover ”</p>
+                            <br>
+                            <img class="slider-img2" src="{{ url_for('static', filename='people/7.jpeg') }}">
+                            <h3 class="slider-name2">DeMorris Byrd</h3>
+                            <br><br>
+                            <hr class="slides-hr1">
+                            <div class="social2">
+                                <img src="{{ url_for('static', filename='svg/instagram-red.svg') }}" class="slider-social">
+                                <img src="{{ url_for('static', filename='svg/facebook-red.svg') }}" class="slider-social">
+                            </div>
+                        </div>
+
+                        <!-- New testimonial added dynamically -->
+                        <div class="dot-container" style="text-align:center">
+                            <span class="dot"></span>
+                            <span class="dot"></span>
+                            <span class="dot"></span>
+                            <span class="dot"></span> <!-- Ensure the new dot is added dynamically here -->
+                        </div>
+                    </div>
+
+                    <script>
+                        var slideIndex = 0;
+                        showSlides();
+
+                        function showSlides() {
+                            var i;
+                            var slides = document.getElementsByClassName("mySlides");
+                            var dots = document.getElementsByClassName("dot");
+                            for (i = 0; i < slides.length; i++) {
+                                slides[i].style.display = "none";
+                            }
+                            slideIndex++;
+                            if (slideIndex > slides.length) {slideIndex = 1}
+                            for (i = 0; i < dots.length; i++) {
+                                dots[i].className = dots[i].className.replace(" active", "");
+                            }
+                            slides[slideIndex-1].style.display = "block";
+                            dots[slideIndex-1].className += " active";
+                            setTimeout(showSlides, 4000); // Change image every 4 seconds
+                        }
+                    </script>
+
+                </article>
+                <div style="clear: both;"></div>
+            </section>
+        </div>
+        <!-- Contact -->
+        <section class="contact-template" id="id-contact">
+            <h1 class="contact-title">Contact</h1>
+            <br><center><h3 class="menu-subtitle">L O C A T E&nbsp;&nbsp;U S</h3></center>
+        </section>
+
+        <div class="contact">
+            <section class="about-section-center-clearfix" style="display: inline; ">
+
+                <article class="contact-map">
+                    <!--left column-->
+                    <br>
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d34057.84094687738!2d28.299114978659045!3d-26.200271135917646!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1e953d4ff96a0167%3A0xbe4d8d182e721589!2sThe%20Pink%20Piano!5e0!3m2!1sen!2sza!4v1715774332508!5m2!1sen!2sza" width="600" height="450" frameborder="0" style="border:0;" allowfullscreen=""
+                            class="contact-iframe"></iframe>
+                    <br><br>
+                </article>
+                <!-- right column -->
+                <article class="contact-img">
+                    <!-- second column -->
+                    <br>
+                    <!-- section title -->
+                    <div class="opening-container">
+                        <img src="{{ url_for('static', filename='images/Struct.jpg') }}" alt="Opening Hours" style="width:100%;">
+                        <div class="opening-text ">
+                            <h3>O P E N&nbsp;&nbsp;H O U R S</h3>
+                            <p>
+                                <strong>Monday: Closed</strong><br>
+                                <strong>Tuesday to Friday</strong><br>
+                                7:00 AM - 9:00 PM<br>
+                                <strong>Saturday & Sunday</strong><br>
+                                11:00 AM - 10:00 PM
+                            </p>
+                        </div>
+                    </div>
+
+
+                    <!--end section title -->
+                </article>
+                <div style="clear: both;"></div>
+            </section>
+            <center>
+                <div class="contact-social">
+                    <a class="contact-social-icons" href="#"><img src="{{ url_for('static', filename='svg/facebook.svg') }}" title="facebook" height="25"></a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <a class="contact-social-icons" href="#"><img src="{{ url_for('static', filename='svg/instagram.svg') }}" title="instagram" height="25"></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <a class="contact-social-icons" href="#"><img src="{{ url_for('static', filename='svg/google.svg') }}" title="gmail" height="25"></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <a class="contact-social-icons" href="#"><img src="{{ url_for('static', filename='svg/linkedin.svg') }}" title="linkedin" height="25"></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <a class="contact-social-icons" href="#"><img src="{{ url_for('static', filename='svg/whatsapp.svg') }}" title="whatsapp" height="25"></a>
+                </div><br>
+                <p class="fontsettings">Copyright © 2024 | <a class="colorcover-link" href="#">Coffee Haven</a></p><br><br>
+                <p class="footer-policy"><a href="{{ url_for('policy') }}" class="colorcover-link">Privacy Policy</a></p>
+            </center>
+        </div>
+    </div>
+
+    <!-- Discount Popup Modal -->
+    <div id="discountModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <p>Welcome to Espresso Haven! You're now part of our coffee family. Check your email for a special 5% discount code on your next brew!</p>
+        </div>
+    </div>
+
+    <!-- Cart Popup -->
+    <div id="cart-popup" class="cart-popup">
+        <div class="cart-popup-header">
+            <h3>Cart</h3>
+            <span class="close" onclick="toggleCart()">&times;</span>
+        </div>
+        <div id="cart-items" class="cart-popup-content">
+            <!-- Cart items will be dynamically inserted here -->
+        </div>
+        <div class="cart-popup-footer">
+            <button class="btn" onclick="toggleCart()">Checkout</button>
+        </div>
+    </div>
+</body>
+</html>

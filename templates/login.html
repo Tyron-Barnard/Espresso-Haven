@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Espresso Haven - Login</title>
+    <link rel="icon" href="{{ url_for('static', filename='svg/coffee.svg') }}" type="image/icon type">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style_login.css') }}" />
+    <style>
+        .footer-policy {
+            margin-top: 20px; /* Adjust as needed to position the button */
+            text-align: center;
+        }
+
+        .footer-policy a {
+            color: #bd1220; /* Match your website's color scheme */
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .footer-policy a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="background-container"></div>
+    <header class="header">
+        <section class="main">
+            <a class="logo" href="{{ url_for('home') }}"><img src="{{ url_for('static', filename='svg/coffee.svg') }}" height="30px"></a>
+            <div class="fix">
+            </div>
+        </section>
+        <div class="banner">
+            <h1 class="banner-title">Espresso Haven</h1>
+        </div>
+    </header>
+    <div class="form-container">
+        <div class="auth-form" id="login-form">
+            <h2>Login</h2>
+            <form method="POST" action="{{ url_for('login') }}">
+                <label for="login-username">Username</label>
+                <input type="text" id="login-username" name="username" placeholder="Username" required>
+                <label for="login-password">Password</label>
+                <input type="password" id="login-password" name="password" placeholder="Password" required>
+                <input type="submit" value="Login">
+            </form>
+            <p>Not a member? <a href="{{ url_for('register') }}">Register</a></p>
+            <p class="footer-policy"><a href="{{ url_for('policy') }}">Privacy Policy</a></p>
+        </div>
+    </div>
+</body>
+</html>
