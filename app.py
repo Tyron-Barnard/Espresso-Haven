@@ -8,11 +8,13 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 
+# Initialize the Flask application
 app = Flask(__name__)
-app.secret_key = os.environ.get('SECRET_KEY', 'DEFAULT_KEY')
 
+# Set the secret key for the Flask application
+app.secret_key = os.environ.get('SECRET_KEY', '429d56ce8188afb4ce934c3c5c9394ca')
 
-# Configure Flask-Mail
+# Configure Flask-Mail for email sending
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
@@ -20,13 +22,16 @@ app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
 app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
 app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_USERNAME')
 
+# Initialize the Mail object with the Flask app configuration
 mail = Mail(app)
 
+# Function to get a database connection
 def get_db_connection():
     conn = sqlite3.connect('users.db')
     conn.row_factory = sqlite3.Row
     return conn
 
+# Function to initialize the database with required tables
 def init_db():
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -51,6 +56,7 @@ def init_db():
     conn.commit()
     conn.close()
 
+# Route for the home page
 @app.route('/')
 def home():
     conn = get_db_connection()
@@ -60,6 +66,7 @@ def home():
     conn.close()
     return render_template('index.html', reviews=reviews)
 
+# Route for user registration
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
@@ -88,6 +95,7 @@ def register():
 
     return render_template('register.html')
 
+# Function to send a discount email to the user
 def send_discount_email(to_email):
     try:
         msg = Message('Your 5% Discount Code', recipients=[to_email])
@@ -98,6 +106,7 @@ def send_discount_email(to_email):
         print(f"Failed to send email: {e}")
         return False
 
+# Route for user login
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -118,15 +127,12 @@ def login():
 
     return render_template('login.html')
 
+# Route for the privacy policy page
 @app.route('/policy')
 def policy():
     return render_template('policy.html')
 
+# Main entry point of the application
 if __name__ == '__main__':
     init_db()  # Initialize the database
     app.run(debug=os.environ.get('FLASK_DEBUG', 'False') == 'True')
-
-if __name__ == '__main__':
-    init_db()  # Initialize the database
-    app.run(debug=os.environ.get('FLASK_DEBUG', 'False') == 'True')
-
