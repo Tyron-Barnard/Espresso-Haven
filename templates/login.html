@@ -1,49 +1,77 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Page Title -->
     <title>Espresso Haven - Login</title>
+    
+    <!-- Favicon -->
     <link rel="icon" href="{{ url_for('static', filename='svg/coffee.svg') }}" type="image/icon type">
+    
+    <!-- External CSS for the Login Page -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style_login.css') }}" />
+    
+    <!-- Internal CSS for additional styles -->
     <style>
+        /* Footer policy styling */
         .footer-policy {
-            margin-top: 20px; /* Adjust as needed to position the button */
+            margin-top: 20px; /* Adjusts the position of the footer policy */
             text-align: center;
         }
 
         .footer-policy a {
-            color: #bd1220; /* Match your website's color scheme */
+            color: #bd1220; /* Matches the website's color scheme */
             text-decoration: none;
             font-weight: bold;
         }
 
         .footer-policy a:hover {
-            text-decoration: underline;
+            text-decoration: underline; /* Adds underline on hover */
         }
     </style>
 </head>
 <body>
+    <!-- Background Container -->
     <div class="background-container"></div>
+    
+    <!-- Header Section -->
     <header class="header">
+        <!-- Main Section -->
         <section class="main">
+            <!-- Logo -->
             <a class="logo" href="{{ url_for('home') }}"><img src="{{ url_for('static', filename='svg/coffee.svg') }}" height="30px"></a>
-            <div class="fix">
-            </div>
+            <!-- Placeholder for potential additional navigation elements -->
+            <div class="fix"></div>
         </section>
+        
+        <!-- Banner Section -->
         <div class="banner">
             <h1 class="banner-title">Espresso Haven</h1>
         </div>
     </header>
+    
+    <!-- Form Container -->
     <div class="form-container">
+        <!-- Authentication Form for Login -->
         <div class="auth-form" id="login-form">
             <h2>Login</h2>
+            <!-- Login Form -->
             <form method="POST" action="{{ url_for('login') }}">
+                <!-- Username Field -->
                 <label for="login-username">Username</label>
                 <input type="text" id="login-username" name="username" placeholder="Username" required>
+                
+                <!-- Password Field -->
                 <label for="login-password">Password</label>
                 <input type="password" id="login-password" name="password" placeholder="Password" required>
+                
+                <!-- Submit Button -->
                 <input type="submit" value="Login">
             </form>
+            
+            <!-- Register Link -->
             <p>Not a member? <a href="{{ url_for('register') }}">Register</a></p>
+            
+            <!-- Privacy Policy Link -->
             <p class="footer-policy"><a href="{{ url_for('policy') }}">Privacy Policy</a></p>
         </div>
     </div>
